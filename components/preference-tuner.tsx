@@ -79,7 +79,7 @@ export function PreferenceTuner({ selectedConcerns, onConcernsChange }: Preferen
           </span>
         </div>
       </CardHeader>
-      <CardContent className="space-y-5 max-h-[calc(100vh-240px)] overflow-y-auto pr-2">
+      <CardContent className="space-y-5">
         {Object.entries(grouped).map(([category, items]) => (
           <div key={category}>
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">

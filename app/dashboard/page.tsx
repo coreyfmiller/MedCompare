@@ -18,6 +18,7 @@ import {
   Menu,
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import Link from "next/link"
 
 export default function MedicationDashboard() {
   const [selectedConcerns, setSelectedConcerns] = useState<Concern[]>([])
@@ -36,7 +37,6 @@ export default function MedicationDashboard() {
 
   const rankedMedications = useMemo(() => {
     if (selectedConcerns.length === 0) {
-      // No ranking — show alphabetically, no scores
       return medications
         .map((medication) => ({
           medication,
@@ -65,31 +65,30 @@ export default function MedicationDashboard() {
 
   return (
     <DisclaimerGate>
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white backdrop-blur-md">
-        <div className="mx-auto flex h-36 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+    <div className="h-screen flex flex-col overflow-hidden bg-white">
+      {/* Header — compact */}
+      <header className="shrink-0 border-b border-slate-200 bg-white z-50">
+        <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6">
+          <Link href="/">
             <img
               src="/logo.png"
               alt="MedCompare"
-              className="h-32 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="hidden sm:flex items-center gap-1.5 font-medium">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            <Badge variant="outline" className="hidden sm:flex items-center gap-1.5 font-medium text-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               {medications.length} Medications
             </Badge>
-            {/* Mobile sidebar trigger */}
             <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="lg:hidden">
-                  <Menu className="h-5 w-5" />
+                <Button variant="outline" size="icon" className="lg:hidden h-8 w-8">
+                  <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[320px] p-0">
-                <div className="p-4 pt-12">
+                <div className="p-4 pt-12 h-full overflow-y-auto">
                   <PreferenceTuner
                     selectedConcerns={selectedConcerns}
                     onConcernsChange={setSelectedConcerns}
@@ -101,26 +100,27 @@ export default function MedicationDashboard() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex gap-6">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-[320px] shrink-0">
-            <div className="sticky top-[160px]">
-              <PreferenceTuner
-                selectedConcerns={selectedConcerns}
-                onConcernsChange={setSelectedConcerns}
-              />
-            </div>
-          </aside>
+      {/* Body — fills remaining height */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Desktop Sidebar — scrolls independently */}
+        <aside className="hidden lg:flex w-[300px] shrink-0 border-r border-slate-100 flex-col">
+          <div className="flex-1 overflow-y-auto p-4">
+            <PreferenceTuner
+              selectedConcerns={selectedConcerns}
+              onConcernsChange={setSelectedConcerns}
+            />
+          </div>
+        </aside>
 
-          {/* Main Content */}
-          <main className="min-w-0 flex-1 space-y-6">
+        {/* Main Content — scrolls independently */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-6 space-y-6">
             {/* Top Recommendations */}
             {selectedConcerns.length > 0 && topMatches.length > 0 && (
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+              <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <h2 className="font-medium text-sm">
+                  <Sparkles className="h-4 w-4 text-indigo-600" />
+                  <h2 className="font-medium text-sm text-slate-900">
                     Top Matches for Your Priorities
                   </h2>
                 </div>
@@ -130,13 +130,13 @@ export default function MedicationDashboard() {
                       key={medication.id}
                       variant="secondary"
                       size="sm"
-                      className="h-auto py-1.5"
+                      className="h-auto py-1.5 bg-white border border-slate-200 hover:bg-slate-50"
                       onClick={() => handleViewDetails(medication)}
                     >
-                      <span className="font-medium">{medication.name}</span>
+                      <span className="font-medium text-slate-700">{medication.name}</span>
                       <Badge
                         variant="outline"
-                        className="ml-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                        className="ml-2 bg-emerald-50 text-emerald-600 border-emerald-200"
                       >
                         {matchScore}%
                       </Badge>
@@ -146,12 +146,14 @@ export default function MedicationDashboard() {
               </div>
             )}
 
-            {/* Empty state when no concerns selected */}
+            {/* Empty state */}
             {selectedConcerns.length === 0 && (
-              <div className="rounded-xl border border-border/50 bg-muted/30 p-6 text-center">
-                <CircleDotIcon className="h-8 w-8 text-muted-foreground/50 mx-auto mb-3" />
-                <p className="text-sm font-medium">Select your priorities to get personalized rankings</p>
-                <p className="text-xs text-muted-foreground mt-1">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+                <div className="mx-auto h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                  <Sparkles className="h-5 w-5 text-slate-400" />
+                </div>
+                <p className="text-sm font-medium text-slate-700">Select your priorities to get personalized rankings</p>
+                <p className="text-xs text-slate-500 mt-1.5 max-w-sm mx-auto">
                   Pick up to 5 concerns from the sidebar and medications will re-rank based on what matters to you
                 </p>
               </div>
@@ -159,10 +161,10 @@ export default function MedicationDashboard() {
 
             {/* View Toggle */}
             <Tabs defaultValue="cards" className="w-full">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
                 <div>
-                  <h2 className="text-xl font-semibold">Medication Comparison</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <h2 className="text-lg font-semibold text-slate-900">Medication Comparison</h2>
+                  <p className="text-sm text-slate-500">
                     {selectedConcerns.length > 0
                       ? "Ranked by your selected priorities"
                       : "Select priorities to see personalized rankings"}
@@ -203,20 +205,17 @@ export default function MedicationDashboard() {
             </Tabs>
 
             {/* Info Banner */}
-            <div className="rounded-xl border border-border/50 bg-card/50 p-4 flex items-start gap-3">
-              <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Understanding the Comparison</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  SSRIs primarily affect serotonin and generally have fewer effects on
-                  adrenaline/norepinephrine. SNRIs increase both serotonin and norepinephrine,
-                  which may cause more autonomic effects. Select your top concerns to see which
-                  medications best match your priorities.
-                </p>
-              </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 flex items-start gap-3">
+              <Info className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-slate-500 leading-relaxed">
+                SSRIs primarily affect serotonin with fewer effects on adrenaline. SNRIs increase both
+                serotonin and norepinephrine. NDRIs target dopamine and norepinephrine. NaSSAs work through
+                adrenergic and serotonin receptor antagonism. Select your top concerns to see which
+                medications best match your priorities.
+              </p>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
 
       {/* Detail Modal */}
@@ -229,25 +228,5 @@ export default function MedicationDashboard() {
       />
     </div>
     </DisclaimerGate>
-  )
-}
-
-function CircleDotIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="1" />
-    </svg>
   )
 }

@@ -21,8 +21,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="fixed top-0 z-50 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <img src="/logo.png" alt="MedCompare" className="h-10 w-auto" />
+        <div className="mx-auto flex h-44 max-w-6xl items-center justify-between px-6">
+          <img src="/logo.png" alt="MedCompare" className="h-40 w-auto" />
           <Link
             href="/dashboard"
             className="rounded-full bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
@@ -33,7 +33,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-52 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/50 via-white to-white" />
         <div className="relative mx-auto max-w-6xl px-6">
           <div className="max-w-3xl mx-auto text-center">

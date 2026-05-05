@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
-import { Medication, priorityLabels, Priority } from "@/lib/medications-data"
+import { Medication, Concern, concerns } from "@/lib/medications-data"
 import { ChartContainer } from "@/components/ui/chart"
 import {
   Radar,
@@ -19,62 +19,50 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from "recharts"
-import { 
-  Pill, 
-  Clock, 
-  AlertTriangle, 
-  FileText, 
+import {
+  Pill,
+  Clock,
+  AlertTriangle,
+  FileText,
   Activity,
-  Heart,
-  Brain,
-  Zap,
-  Scale
+  CheckCircle2,
 } from "lucide-react"
 
 interface MedicationDetailModalProps {
   medication: Medication | null
   matchScore: number
+  selectedConcerns: Concern[]
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-const priorityIcons: Record<Priority, React.ReactNode> = {
-  autonomicStability: <Heart className="h-4 w-4" />,
-  sexualHealth: <Brain className="h-4 w-4" />,
-  adrenalineSensitivity: <Zap className="h-4 w-4" />,
-  metabolicNeutrality: <Scale className="h-4 w-4" />,
 }
 
 export function MedicationDetailModal({
   medication,
   matchScore,
+  selectedConcerns,
   open,
   onOpenChange,
 }: MedicationDetailModalProps) {
   if (!medication) return null
 
-  const radarData = [
-    {
-      subject: "Autonomic Stability",
-      value: medication.scores.autonomicStability,
-      fullMark: 100,
-    },
-    {
-      subject: "Sexual Health",
-      value: medication.scores.sexualHealth,
-      fullMark: 100,
-    },
-    {
-      subject: "Low Adrenaline",
-      value: medication.scores.adrenalineSensitivity,
-      fullMark: 100,
-    },
-    {
-      subject: "Metabolic Neutrality",
-      value: medication.scores.metabolicNeutrality,
-      fullMark: 100,
-    },
-  ]
+  // Build radar data from selected concerns or default set
+  const radarData =
+    selectedConcerns.length > 0
+      ? selectedConcerns.map((concernId) => {
+          const info = concerns.find((c) => c.id === concernId)
+          return {
+            subject: info?.label ?? concernId,
+            value: medication.scores[concernId],
+            fullMark: 100,
+          }
+        })
+      : [
+          { subject: "Autonomic Stability", value: medication.scores.autonomicStability, fullMark: 100 },
+          { subject: "Sexual Health", value: medication.scores.libido, fullMark: 100 },
+          { subject: "Weight Neutrality", value: medication.scores.weightNeutrality, fullMark: 100 },
+          { subject: "Mental Clarity", value: medication.scores.mentalClarity, fullMark: 100 },
+          { subject: "Anxiety Reduction", value: medication.scores.anxietyReduction, fullMark: 100 },
+        ]
 
   const chartConfig = {
     value: {
@@ -84,23 +72,31 @@ export function MedicationDetailModal({
   }
 
   const getMatchColor = (score: number) => {
-    if (score >= 80) return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-    if (score >= 60) return "bg-amber-500/10 text-amber-600 border-amber-500/20"
+    if (score >= 75) return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+    if (score >= 55) return "bg-amber-500/10 text-amber-600 border-amber-500/20"
     return "bg-slate-500/10 text-slate-600 border-slate-500/20"
   }
 
   const getScoreColor = (score: number) => {
     if (score >= 75) return "text-emerald-600"
     if (score >= 50) return "text-amber-600"
-    return "text-slate-500"
+    return "text-red-500"
   }
 
-  const priorities: Priority[] = [
-    "autonomicStability",
-    "sexualHealth",
-    "adrenalineSensitivity",
-    "metabolicNeutrality",
-  ]
+  // Show scores for selected concerns, or a default set
+  const displayConcerns: { id: Concern; label: string }[] =
+    selectedConcerns.length > 0
+      ? selectedConcerns.map((id) => ({
+          id,
+          label: concerns.find((c) => c.id === id)?.label ?? id,
+        }))
+      : [
+          { id: "autonomicStability" as Concern, label: "Autonomic Stability" },
+          { id: "libido" as Concern, label: "Libido Preservation" },
+          { id: "weightNeutrality" as Concern, label: "Weight Neutrality" },
+          { id: "mentalClarity" as Concern, label: "Mental Clarity" },
+          { id: "anxietyReduction" as Concern, label: "Anxiety Reduction" },
+        ]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -120,8 +116,8 @@ export function MedicationDetailModal({
                 </DialogDescription>
               </div>
             </div>
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className={`text-sm font-semibold tabular-nums px-3 py-1 ${getMatchColor(matchScore)}`}
             >
               {matchScore}% Match
@@ -132,7 +128,10 @@ export function MedicationDetailModal({
         <div className="grid gap-6 mt-2">
           {/* Quick Info */}
           <div className="flex flex-wrap items-center gap-3">
-            <Badge variant={medication.class === "SSRI" ? "default" : "secondary"} className="font-medium">
+            <Badge
+              variant={medication.class === "SSRI" ? "default" : "secondary"}
+              className="font-medium"
+            >
               {medication.class}
             </Badge>
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -157,7 +156,9 @@ export function MedicationDetailModal({
           {/* Radar Chart & Scores */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-sm mb-4">Profile Overview</h4>
+              <h4 className="font-medium text-sm mb-4">
+                {selectedConcerns.length > 0 ? "Your Priority Profile" : "Profile Overview"}
+              </h4>
               <div className="h-[200px]">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
@@ -185,19 +186,21 @@ export function MedicationDetailModal({
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium text-sm">Detailed Scores</h4>
-              {priorities.map((priority) => (
-                <div key={priority} className="space-y-1.5">
+              <h4 className="font-medium text-sm flex items-center gap-2">
+                {selectedConcerns.length > 0 && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                {selectedConcerns.length > 0 ? "Scores for Your Priorities" : "Key Scores"}
+              </h4>
+              {displayConcerns.map(({ id, label }) => (
+                <div key={id} className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">{priorityIcons[priority]}</span>
-                      <span>{priorityLabels[priority]}</span>
-                    </div>
-                    <span className={`font-semibold tabular-nums ${getScoreColor(medication.scores[priority])}`}>
-                      {medication.scores[priority]}%
+                    <span className="text-muted-foreground">{label}</span>
+                    <span
+                      className={`font-semibold tabular-nums ${getScoreColor(medication.scores[id])}`}
+                    >
+                      {medication.scores[id]}%
                     </span>
                   </div>
-                  <Progress value={medication.scores[priority]} className="h-1.5" />
+                  <Progress value={medication.scores[id]} className="h-1.5" />
                 </div>
               ))}
             </div>
@@ -238,8 +241,9 @@ export function MedicationDetailModal({
           {/* Disclaimer */}
           <div className="rounded-lg bg-amber-500/5 border border-amber-500/20 p-4">
             <p className="text-xs text-amber-700 leading-relaxed">
-              <strong>Disclaimer:</strong> This information is for educational purposes only and should not be considered medical advice. 
-              Always consult with a qualified healthcare provider before starting, stopping, or changing any medication.
+              <strong>Disclaimer:</strong> This information is for educational purposes only and
+              should not be considered medical advice. Always consult with a qualified healthcare
+              provider before starting, stopping, or changing any medication.
             </p>
           </div>
         </div>

@@ -5,49 +5,36 @@ import { PreferenceTuner } from "@/components/preference-tuner"
 import { MedicationCard } from "@/components/medication-card"
 import { ComparisonTable } from "@/components/comparison-table"
 import { MedicationDetailModal } from "@/components/medication-detail-modal"
-import { medications, Medication, Priority } from "@/lib/medications-data"
+import { medications, Medication, Concern } from "@/lib/medications-data"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Pill, 
-  LayoutGrid, 
-  Table as TableIcon, 
+import {
+  Pill,
+  LayoutGrid,
+  Table as TableIcon,
   Info,
   Sparkles,
   Menu,
-  X
 } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 export default function MedicationDashboard() {
-  const [weights, setWeights] = useState<Record<Priority, number>>({
-    autonomicStability: 50,
-    sexualHealth: 50,
-    adrenalineSensitivity: 50,
-    metabolicNeutrality: 50,
-  })
-
+  const [selectedConcerns, setSelectedConcerns] = useState<Concern[]>([])
   const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const calculateMatchScore = (medication: Medication): number => {
-    const totalWeight = 
-      weights.autonomicStability + 
-      weights.sexualHealth + 
-      weights.adrenalineSensitivity + 
-      weights.metabolicNeutrality
+    if (selectedConcerns.length === 0) {
+      // No concerns selected: average all scores
+      const allScores = Object.values(medication.scores)
+      return Math.round(allScores.reduce((sum, s) => sum + s, 0) / allScores.length)
+    }
 
-    if (totalWeight === 0) return 50
-
-    const weightedSum =
-      (medication.scores.autonomicStability * weights.autonomicStability) +
-      (medication.scores.sexualHealth * weights.sexualHealth) +
-      (medication.scores.adrenalineSensitivity * weights.adrenalineSensitivity) +
-      (medication.scores.metabolicNeutrality * weights.metabolicNeutrality)
-
-    return Math.round(weightedSum / totalWeight)
+    // Average only the selected concern scores
+    const total = selectedConcerns.reduce((sum, concern) => sum + medication.scores[concern], 0)
+    return Math.round(total / selectedConcerns.length)
   }
 
   const rankedMedications = useMemo(() => {
@@ -57,18 +44,18 @@ export default function MedicationDashboard() {
         matchScore: calculateMatchScore(medication),
       }))
       .sort((a, b) => b.matchScore - a.matchScore)
-  }, [weights])
+  }, [selectedConcerns])
 
   const handleViewDetails = (medication: Medication) => {
     setSelectedMedication(medication)
     setIsDetailOpen(true)
   }
 
-  const selectedMatchScore = selectedMedication 
-    ? calculateMatchScore(selectedMedication) 
+  const selectedMatchScore = selectedMedication
+    ? calculateMatchScore(selectedMedication)
     : 0
 
-  const topMatches = rankedMedications.filter(m => m.matchScore >= 75)
+  const topMatches = rankedMedications.filter((m) => m.matchScore >= 75)
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,7 +68,9 @@ export default function MedicationDashboard() {
             </div>
             <div>
               <h1 className="text-lg font-semibold">MedCompare</h1>
-              <p className="hidden sm:block text-xs text-muted-foreground">SSRI & SNRI Comparison</p>
+              <p className="hidden sm:block text-xs text-muted-foreground">
+                SSRI & SNRI Comparison
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -97,8 +86,11 @@ export default function MedicationDashboard() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[320px] p-0">
-                <div className="p-4">
-                  <PreferenceTuner weights={weights} onWeightsChange={setWeights} />
+                <div className="p-4 pt-12">
+                  <PreferenceTuner
+                    selectedConcerns={selectedConcerns}
+                    onConcernsChange={setSelectedConcerns}
+                  />
                 </div>
               </SheetContent>
             </Sheet>
@@ -111,18 +103,23 @@ export default function MedicationDashboard() {
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-[320px] shrink-0">
             <div className="sticky top-[88px]">
-              <PreferenceTuner weights={weights} onWeightsChange={setWeights} />
+              <PreferenceTuner
+                selectedConcerns={selectedConcerns}
+                onConcernsChange={setSelectedConcerns}
+              />
             </div>
           </aside>
 
           {/* Main Content */}
           <main className="min-w-0 flex-1 space-y-6">
             {/* Top Recommendations */}
-            {topMatches.length > 0 && (
+            {selectedConcerns.length > 0 && topMatches.length > 0 && (
               <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="h-4 w-4 text-primary" />
-                  <h2 className="font-medium text-sm">Top Recommendations Based on Your Priorities</h2>
+                  <h2 className="font-medium text-sm">
+                    Top Matches for Your Priorities
+                  </h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {topMatches.slice(0, 4).map(({ medication, matchScore }) => (
@@ -134,12 +131,26 @@ export default function MedicationDashboard() {
                       onClick={() => handleViewDetails(medication)}
                     >
                       <span className="font-medium">{medication.name}</span>
-                      <Badge variant="outline" className="ml-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                      <Badge
+                        variant="outline"
+                        className="ml-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                      >
                         {matchScore}%
                       </Badge>
                     </Button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Empty state when no concerns selected */}
+            {selectedConcerns.length === 0 && (
+              <div className="rounded-xl border border-border/50 bg-muted/30 p-6 text-center">
+                <CircleDotIcon className="h-8 w-8 text-muted-foreground/50 mx-auto mb-3" />
+                <p className="text-sm font-medium">Select your priorities to get personalized rankings</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Pick up to 5 concerns from the sidebar and medications will re-rank based on what matters to you
+                </p>
               </div>
             )}
 
@@ -149,7 +160,9 @@ export default function MedicationDashboard() {
                 <div>
                   <h2 className="text-xl font-semibold">Medication Comparison</h2>
                   <p className="text-sm text-muted-foreground">
-                    Ranked by your personalized preferences
+                    {selectedConcerns.length > 0
+                      ? "Ranked by your selected priorities"
+                      : "Showing overall average scores"}
                   </p>
                 </div>
                 <TabsList className="grid w-full sm:w-auto grid-cols-2">
@@ -171,6 +184,7 @@ export default function MedicationDashboard() {
                       key={medication.id}
                       medication={medication}
                       matchScore={matchScore}
+                      selectedConcerns={selectedConcerns}
                       onViewDetails={handleViewDetails}
                     />
                   ))}
@@ -191,9 +205,10 @@ export default function MedicationDashboard() {
               <div className="space-y-1">
                 <p className="text-sm font-medium">Understanding the Comparison</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  SSRIs primarily affect serotonin and generally have fewer effects on adrenaline/norepinephrine. 
-                  SNRIs increase both serotonin and norepinephrine, which may cause more autonomic effects. 
-                  Adjust the sliders to prioritize what matters most to you.
+                  SSRIs primarily affect serotonin and generally have fewer effects on
+                  adrenaline/norepinephrine. SNRIs increase both serotonin and norepinephrine,
+                  which may cause more autonomic effects. Select your top concerns to see which
+                  medications best match your priorities.
                 </p>
               </div>
             </div>
@@ -205,9 +220,30 @@ export default function MedicationDashboard() {
       <MedicationDetailModal
         medication={selectedMedication}
         matchScore={selectedMatchScore}
+        selectedConcerns={selectedConcerns}
         open={isDetailOpen}
         onOpenChange={setIsDetailOpen}
       />
     </div>
+  )
+}
+
+function CircleDotIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="1" />
+    </svg>
   )
 }

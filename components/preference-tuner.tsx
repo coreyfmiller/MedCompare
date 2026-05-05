@@ -1,54 +1,40 @@
 "use client"
 
-import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Priority, priorityLabels, priorityDescriptions } from "@/lib/medications-data"
-import { 
-  Heart, 
-  Brain, 
-  Zap, 
-  Scale,
-  RotateCcw,
-  SlidersHorizontal
-} from "lucide-react"
+import { concerns, Concern, ConcernInfo } from "@/lib/medications-data"
+import { RotateCcw, CheckCircle2, CircleDot } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+const MAX_SELECTIONS = 5
 
 interface PreferenceTunerProps {
-  weights: Record<Priority, number>
-  onWeightsChange: (weights: Record<Priority, number>) => void
+  selectedConcerns: Concern[]
+  onConcernsChange: (concerns: Concern[]) => void
 }
 
-const priorityIcons: Record<Priority, React.ReactNode> = {
-  autonomicStability: <Heart className="h-4 w-4" />,
-  sexualHealth: <Brain className="h-4 w-4" />,
-  adrenalineSensitivity: <Zap className="h-4 w-4" />,
-  metabolicNeutrality: <Scale className="h-4 w-4" />,
-}
-
-export function PreferenceTuner({ weights, onWeightsChange }: PreferenceTunerProps) {
-  const handleSliderChange = (priority: Priority, value: number[]) => {
-    onWeightsChange({
-      ...weights,
-      [priority]: value[0],
-    })
+export function PreferenceTuner({ selectedConcerns, onConcernsChange }: PreferenceTunerProps) {
+  const handleToggle = (concernId: Concern) => {
+    if (selectedConcerns.includes(concernId)) {
+      onConcernsChange(selectedConcerns.filter((c) => c !== concernId))
+    } else if (selectedConcerns.length < MAX_SELECTIONS) {
+      onConcernsChange([...selectedConcerns, concernId])
+    }
   }
 
-  const resetWeights = () => {
-    onWeightsChange({
-      autonomicStability: 50,
-      sexualHealth: 50,
-      adrenalineSensitivity: 50,
-      metabolicNeutrality: 50,
-    })
+  const resetSelections = () => {
+    onConcernsChange([])
   }
 
-  const priorities: Priority[] = [
-    "autonomicStability",
-    "sexualHealth",
-    "adrenalineSensitivity",
-    "metabolicNeutrality",
-  ]
+  // Group concerns by category
+  const grouped = concerns.reduce<Record<string, ConcernInfo[]>>((acc, concern) => {
+    if (!acc[concern.category]) acc[concern.category] = []
+    acc[concern.category].push(concern)
+    return acc
+  }, {})
+
+  const remaining = MAX_SELECTIONS - selectedConcerns.length
 
   return (
     <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
@@ -56,52 +42,75 @@ export function PreferenceTuner({ weights, onWeightsChange }: PreferenceTunerPro
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <SlidersHorizontal className="h-4 w-4 text-primary" />
+              <CircleDot className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-base">Preference Tuner</CardTitle>
-              <CardDescription className="text-xs">Adjust your health priorities</CardDescription>
+              <CardTitle className="text-base">Your Priorities</CardTitle>
+              <CardDescription className="text-xs">Pick up to 5 concerns</CardDescription>
             </div>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={resetWeights}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetSelections}
             className="h-8 px-2 text-muted-foreground hover:text-foreground"
+            disabled={selectedConcerns.length === 0}
           >
             <RotateCcw className="mr-1 h-3 w-3" />
             Reset
           </Button>
         </div>
+        {/* Counter */}
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex gap-1">
+            {Array.from({ length: MAX_SELECTIONS }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-2 w-2 rounded-full transition-colors",
+                  i < selectedConcerns.length ? "bg-primary" : "bg-muted-foreground/20"
+                )}
+              />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {selectedConcerns.length} of {MAX_SELECTIONS} selected
+            {remaining > 0 && selectedConcerns.length > 0 && ` · ${remaining} remaining`}
+          </span>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {priorities.map((priority) => (
-          <div key={priority} className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                  {priorityIcons[priority]}
-                </div>
-                <span className="text-sm font-medium">{priorityLabels[priority]}</span>
-              </div>
-              <Badge 
-                variant={weights[priority] >= 70 ? "default" : "secondary"} 
-                className="text-xs tabular-nums"
-              >
-                {weights[priority]}%
-              </Badge>
+      <CardContent className="space-y-5 max-h-[calc(100vh-240px)] overflow-y-auto pr-2">
+        {Object.entries(grouped).map(([category, items]) => (
+          <div key={category}>
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+              {category}
+            </h4>
+            <div className="flex flex-wrap gap-1.5">
+              {items.map((concern) => {
+                const isSelected = selectedConcerns.includes(concern.id)
+                const isDisabled = !isSelected && selectedConcerns.length >= MAX_SELECTIONS
+
+                return (
+                  <button
+                    key={concern.id}
+                    onClick={() => handleToggle(concern.id)}
+                    disabled={isDisabled}
+                    title={concern.description}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+                      "border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                      isSelected
+                        ? "border-primary bg-primary/10 text-primary shadow-sm"
+                        : "border-border/60 bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                      isDisabled && "opacity-40 cursor-not-allowed hover:border-border/60 hover:text-muted-foreground"
+                    )}
+                  >
+                    {isSelected && <CheckCircle2 className="h-3 w-3" />}
+                    {concern.label}
+                  </button>
+                )
+              })}
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {priorityDescriptions[priority]}
-            </p>
-            <Slider
-              value={[weights[priority]]}
-              onValueChange={(value) => handleSliderChange(priority, value)}
-              max={100}
-              min={0}
-              step={5}
-              className="py-1"
-            />
           </div>
         ))}
       </CardContent>

@@ -101,6 +101,9 @@ export function MedicationCard({
             <span>{medication.halfLife}</span>
           </div>
         </div>
+        <div className="text-xs text-muted-foreground">
+          {medication.doseRange}
+        </div>
 
         <div className="h-[140px] w-full" key={chartKey}>
           <ChartContainer config={chartConfig} className="h-full w-full">

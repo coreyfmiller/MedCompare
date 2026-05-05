@@ -29,7 +29,7 @@ interface ComparisonTableProps {
 
 export function ComparisonTable({ medications, onViewDetails }: ComparisonTableProps) {
   const [search, setSearch] = useState("")
-  const [classFilter, setClassFilter] = useState<"all" | "SSRI" | "SNRI">("all")
+  const [classFilter, setClassFilter] = useState<"all" | "SSRI" | "SNRI" | "NDRI" | "NaSSA">("all")
   const [sortField, setSortField] = useState<"matchScore" | "halfLifeHours" | "name">("matchScore")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
 
@@ -93,6 +93,8 @@ export function ComparisonTable({ medications, onViewDetails }: ComparisonTableP
               <SelectItem value="all">All Classes</SelectItem>
               <SelectItem value="SSRI">SSRI Only</SelectItem>
               <SelectItem value="SNRI">SNRI Only</SelectItem>
+              <SelectItem value="NDRI">NDRI Only</SelectItem>
+              <SelectItem value="NaSSA">NaSSA Only</SelectItem>
             </SelectContent>
           </Select>
         </div>

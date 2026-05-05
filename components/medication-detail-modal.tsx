@@ -147,6 +147,22 @@ export function MedicationDetailModal({
             </div>
           </div>
 
+          {/* Dosing Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Dose Range</p>
+              <p className="text-sm font-medium">{medication.doseRange}</p>
+            </div>
+            <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Time to Effect</p>
+              <p className="text-sm font-medium">{medication.timeToEffect}</p>
+            </div>
+            <div className="rounded-lg border border-border/50 bg-muted/30 p-3 sm:col-span-2">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Available Doses</p>
+              <p className="text-sm">{medication.availableDoses}</p>
+            </div>
+          </div>
+
           {/* Primary Action */}
           <div className="rounded-lg border border-border/50 bg-muted/30 p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -243,6 +259,26 @@ export function MedicationDetailModal({
                 {medication.clinicalNotes}
               </p>
             </div>
+          </div>
+
+          <Separator />
+
+          {/* FDA Indications */}
+          <div>
+            <h4 className="font-medium text-sm mb-3">FDA-Approved Indications</h4>
+            <div className="flex flex-wrap gap-2">
+              {medication.fdaIndications.map((indication) => (
+                <Badge key={indication} variant="secondary" className="font-normal">
+                  {indication}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Pregnancy Risk */}
+          <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Pregnancy Risk</p>
+            <p className="text-sm">{medication.pregnancyRisk}</p>
           </div>
 
           {/* Disclaimer */}

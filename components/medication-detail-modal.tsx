@@ -72,9 +72,17 @@ export function MedicationDetailModal({
   const chartConfig = {
     value: {
       label: "Score",
-      color: "hsl(var(--primary))",
+      color: medication.class === "SSRI" ? "hsl(225, 70%, 55%)"
+        : medication.class === "SNRI" ? "hsl(38, 85%, 50%)"
+        : medication.class === "NDRI" ? "hsl(152, 60%, 42%)"
+        : "hsl(270, 60%, 55%)",
     },
   }
+
+  const radarColor = medication.class === "SSRI" ? "hsl(225, 70%, 55%)"
+    : medication.class === "SNRI" ? "hsl(38, 85%, 50%)"
+    : medication.class === "NDRI" ? "hsl(152, 60%, 42%)"
+    : "hsl(270, 60%, 55%)"
 
   const getMatchColor = (score: number) => {
     if (score >= 75) return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
@@ -198,9 +206,9 @@ export function MedicationDetailModal({
                     <Radar
                       name="Profile"
                       dataKey="value"
-                      stroke="hsl(var(--primary))"
-                      fill="hsl(var(--primary))"
-                      fillOpacity={0.25}
+                      stroke={radarColor}
+                      fill={radarColor}
+                      fillOpacity={0.2}
                       strokeWidth={2}
                     />
                   </RadarChart>

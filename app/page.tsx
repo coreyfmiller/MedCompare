@@ -70,15 +70,9 @@ export default function MedicationDashboard() {
           <div className="flex items-center gap-3">
             <img
               src="/logo.png"
-              alt="MedCompare logo"
-              className="h-9 w-9 rounded-lg object-contain"
+              alt="MedCompare"
+              className="h-8 w-auto object-contain"
             />
-            <div>
-              <h1 className="text-lg font-semibold">MedCompare</h1>
-              <p className="hidden sm:block text-xs text-muted-foreground">
-                SSRI & SNRI Comparison
-              </p>
-            </div>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="hidden sm:flex items-center gap-1.5 font-medium">

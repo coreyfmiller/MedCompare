@@ -23,7 +23,7 @@ import { Medication } from "@/lib/medications-data"
 import { Search, ArrowUpDown, Info, Filter } from "lucide-react"
 
 interface ComparisonTableProps {
-  medications: Array<{ medication: Medication; matchScore: number }>
+  medications: Array<{ medication: Medication; matchScore: number | null }>
   onViewDetails: (medication: Medication) => void
 }
 
@@ -46,7 +46,7 @@ export function ComparisonTable({ medications, onViewDetails }: ComparisonTableP
       .sort((a, b) => {
         let comparison = 0
         if (sortField === "matchScore") {
-          comparison = a.matchScore - b.matchScore
+          comparison = (a.matchScore ?? 0) - (b.matchScore ?? 0)
         } else if (sortField === "halfLifeHours") {
           comparison = a.medication.halfLifeHours - b.medication.halfLifeHours
         } else if (sortField === "name") {
@@ -170,12 +170,16 @@ export function ComparisonTable({ medications, onViewDetails }: ComparisonTableP
                   </p>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Badge 
-                    variant="outline" 
-                    className={`font-semibold tabular-nums ${getMatchColor(matchScore)}`}
-                  >
-                    {matchScore}%
-                  </Badge>
+                  {matchScore !== null ? (
+                    <Badge 
+                      variant="outline" 
+                      className={`font-semibold tabular-nums ${getMatchColor(matchScore)}`}
+                    >
+                      {matchScore}%
+                    </Badge>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Button

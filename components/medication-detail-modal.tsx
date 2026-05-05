@@ -30,7 +30,7 @@ import {
 
 interface MedicationDetailModalProps {
   medication: Medication | null
-  matchScore: number
+  matchScore: number | null
   selectedConcerns: Concern[]
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -121,12 +121,14 @@ export function MedicationDetailModal({
                 </DialogDescription>
               </div>
             </div>
-            <Badge
-              variant="outline"
-              className={`text-sm font-semibold tabular-nums px-3 py-1 ${getMatchColor(matchScore)}`}
-            >
-              {matchScore}% Match
-            </Badge>
+            {matchScore !== null && (
+              <Badge
+                variant="outline"
+                className={`text-sm font-semibold tabular-nums px-3 py-1 ${getMatchColor(matchScore)}`}
+              >
+                {matchScore}% Match
+              </Badge>
+            )}
           </div>
         </DialogHeader>
 

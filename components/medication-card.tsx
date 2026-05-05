@@ -16,7 +16,7 @@ import { Info, Clock, Pill } from "lucide-react"
 
 interface MedicationCardProps {
   medication: Medication
-  matchScore: number
+  matchScore: number | null
   selectedConcerns: Concern[]
   onViewDetails: (medication: Medication) => void
 }
@@ -70,14 +70,16 @@ export function MedicationCard({
 
   return (
     <Card className="group relative overflow-hidden border-border/50 bg-card/80 backdrop-blur-sm transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-      <div className="absolute right-3 top-3">
-        <Badge
-          variant="outline"
-          className={`text-xs font-semibold tabular-nums ${getMatchColor(matchScore)}`}
-        >
-          {matchScore}% Match
-        </Badge>
-      </div>
+      {matchScore !== null && (
+        <div className="absolute right-3 top-3">
+          <Badge
+            variant="outline"
+            className={`text-xs font-semibold tabular-nums ${getMatchColor(matchScore)}`}
+          >
+            {matchScore}% Match
+          </Badge>
+        </div>
+      )}
       <CardHeader className="pb-2">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">

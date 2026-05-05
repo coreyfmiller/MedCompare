@@ -35,12 +35,21 @@ export default function MedicationDashboard() {
   }
 
   const rankedMedications = useMemo(() => {
+    if (selectedConcerns.length === 0) {
+      // No ranking — show alphabetically, no scores
+      return medications
+        .map((medication) => ({
+          medication,
+          matchScore: null as number | null,
+        }))
+        .sort((a, b) => a.medication.name.localeCompare(b.medication.name))
+    }
     return medications
       .map((medication) => ({
         medication,
         matchScore: calculateMatchScore(medication, selectedConcerns),
       }))
-      .sort((a, b) => b.matchScore - a.matchScore)
+      .sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
   }, [selectedConcerns])
 
   const handleViewDetails = (medication: Medication) => {
@@ -48,11 +57,11 @@ export default function MedicationDashboard() {
     setIsDetailOpen(true)
   }
 
-  const selectedMatchScore = selectedMedication
+  const selectedMatchScore = selectedMedication && selectedConcerns.length > 0
     ? calculateMatchScore(selectedMedication, selectedConcerns)
-    : 0
+    : null
 
-  const topMatches = rankedMedications.filter((m) => m.matchScore >= 75)
+  const topMatches = rankedMedications.filter((m) => m.matchScore !== null && m.matchScore >= 75)
 
   return (
     <div className="min-h-screen bg-background">
@@ -159,7 +168,7 @@ export default function MedicationDashboard() {
                   <p className="text-sm text-muted-foreground">
                     {selectedConcerns.length > 0
                       ? "Ranked by your selected priorities"
-                      : "Showing overall average scores"}
+                      : "Select priorities to see personalized rankings"}
                   </p>
                 </div>
                 <TabsList className="grid w-full sm:w-auto grid-cols-2">

@@ -5,6 +5,7 @@ import { PreferenceTuner } from "@/components/preference-tuner"
 import { MedicationCard } from "@/components/medication-card"
 import { ComparisonTable } from "@/components/comparison-table"
 import { MedicationDetailModal } from "@/components/medication-detail-modal"
+import { DisclaimerGate } from "@/components/disclaimer-gate"
 import { medications, Medication, Concern } from "@/lib/medications-data"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -63,6 +64,7 @@ export default function MedicationDashboard() {
   const topMatches = rankedMedications.filter((m) => m.matchScore !== null && m.matchScore >= 75)
 
   return (
+    <DisclaimerGate>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
@@ -226,6 +228,7 @@ export default function MedicationDashboard() {
         onOpenChange={setIsDetailOpen}
       />
     </div>
+    </DisclaimerGate>
   )
 }
 

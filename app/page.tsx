@@ -240,12 +240,17 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-100 py-12">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <img src="/logo.png" alt="MedCompare" className="h-24 w-auto opacity-60" />
-            <p className="text-xs text-slate-400 text-center sm:text-right max-w-md">
-              This tool is for educational purposes only and does not constitute medical advice.
-              Always consult a qualified healthcare provider before making medication decisions.
-            </p>
+            <div className="text-center sm:text-right space-y-2">
+              <Link href="/disclaimer" className="text-xs text-slate-400 underline hover:text-slate-600">
+                Disclaimer & Terms of Use
+              </Link>
+              <p className="text-xs text-slate-400 max-w-md">
+                This tool is a proof of concept for educational purposes only and does not constitute
+                medical advice. Always consult a qualified healthcare provider before making medication decisions.
+              </p>
+            </div>
           </div>
         </div>
       </footer>

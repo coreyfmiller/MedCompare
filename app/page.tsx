@@ -66,12 +66,12 @@ export default function MedicationDashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-36 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <img
               src="/logo.png"
               alt="MedCompare"
-              className="h-8 w-auto object-contain"
+              className="h-32 w-auto object-contain"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function MedicationDashboard() {
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-[320px] shrink-0">
-            <div className="sticky top-[88px]">
+            <div className="sticky top-[160px]">
               <PreferenceTuner
                 selectedConcerns={selectedConcerns}
                 onConcernsChange={setSelectedConcerns}

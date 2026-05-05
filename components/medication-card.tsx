@@ -28,11 +28,11 @@ export function MedicationCard({
   onViewDetails,
 }: MedicationCardProps) {
   // Build radar data from selected concerns (or top 4 scores if none selected)
-  const radarData = selectedConcerns.length > 0
+  const radarData = selectedConcerns.length >= 3
     ? selectedConcerns.map((concernId) => {
         const info = concerns.find((c) => c.id === concernId)
         return {
-          subject: info?.label.replace(/\s+/g, "\n").split("\n")[0] ?? concernId,
+          subject: info?.label.split(" ")[0] ?? concernId,
           value: medication.scores[concernId],
           fullMark: 100,
         }
@@ -43,6 +43,11 @@ export function MedicationCard({
         { subject: "Metabolic", value: medication.scores.weightNeutrality, fullMark: 100 },
         { subject: "Cognitive", value: medication.scores.mentalClarity, fullMark: 100 },
       ]
+
+  // Key to force remount when selections change
+  const chartKey = selectedConcerns.length >= 3
+    ? selectedConcerns.join("-")
+    : "default"
 
   const chartConfig = {
     value: {
@@ -95,7 +100,7 @@ export function MedicationCard({
           </div>
         </div>
 
-        <div className="h-[140px] w-full">
+        <div className="h-[140px] w-full" key={chartKey}>
           <ChartContainer config={chartConfig} className="h-full w-full">
             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
               <PolarGrid stroke="hsl(var(--border))" strokeDasharray="3 3" />

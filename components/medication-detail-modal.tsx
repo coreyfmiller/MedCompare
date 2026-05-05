@@ -47,7 +47,7 @@ export function MedicationDetailModal({
 
   // Build radar data from selected concerns or default set
   const radarData =
-    selectedConcerns.length > 0
+    selectedConcerns.length >= 3
       ? selectedConcerns.map((concernId) => {
           const info = concerns.find((c) => c.id === concernId)
           return {
@@ -63,6 +63,11 @@ export function MedicationDetailModal({
           { subject: "Mental Clarity", value: medication.scores.mentalClarity, fullMark: 100 },
           { subject: "Anxiety Reduction", value: medication.scores.anxietyReduction, fullMark: 100 },
         ]
+
+  // Force remount when selections change
+  const chartKey = selectedConcerns.length >= 3
+    ? selectedConcerns.join("-")
+    : "default-modal"
 
   const chartConfig = {
     value: {
@@ -159,7 +164,7 @@ export function MedicationDetailModal({
               <h4 className="font-medium text-sm mb-4">
                 {selectedConcerns.length > 0 ? "Your Priority Profile" : "Profile Overview"}
               </h4>
-              <div className="h-[200px]">
+              <div className="h-[200px]" key={chartKey}>
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
                     <PolarGrid stroke="hsl(var(--border))" strokeDasharray="3 3" />

@@ -25,23 +25,20 @@ export default function MedicationDashboard() {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const calculateMatchScore = (medication: Medication): number => {
-    if (selectedConcerns.length === 0) {
-      // No concerns selected: average all scores
+  const calculateMatchScore = (medication: Medication, activeConcerns: Concern[]): number => {
+    if (activeConcerns.length === 0) {
       const allScores = Object.values(medication.scores)
       return Math.round(allScores.reduce((sum, s) => sum + s, 0) / allScores.length)
     }
-
-    // Average only the selected concern scores
-    const total = selectedConcerns.reduce((sum, concern) => sum + medication.scores[concern], 0)
-    return Math.round(total / selectedConcerns.length)
+    const total = activeConcerns.reduce((sum, concern) => sum + medication.scores[concern], 0)
+    return Math.round(total / activeConcerns.length)
   }
 
   const rankedMedications = useMemo(() => {
     return medications
       .map((medication) => ({
         medication,
-        matchScore: calculateMatchScore(medication),
+        matchScore: calculateMatchScore(medication, selectedConcerns),
       }))
       .sort((a, b) => b.matchScore - a.matchScore)
   }, [selectedConcerns])
@@ -52,7 +49,7 @@ export default function MedicationDashboard() {
   }
 
   const selectedMatchScore = selectedMedication
-    ? calculateMatchScore(selectedMedication)
+    ? calculateMatchScore(selectedMedication, selectedConcerns)
     : 0
 
   const topMatches = rankedMedications.filter((m) => m.matchScore >= 75)

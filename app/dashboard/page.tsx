@@ -6,7 +6,7 @@ import { MedicationCard } from "@/components/medication-card"
 import { ComparisonTable } from "@/components/comparison-table"
 import { MedicationDetailModal } from "@/components/medication-detail-modal"
 import { DisclaimerGate } from "@/components/disclaimer-gate"
-import { medications, Medication, Concern } from "@/lib/medications-data"
+import { medications, Medication, Concern, concerns } from "@/lib/medications-data"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -156,6 +156,24 @@ export default function MedicationDashboard() {
                 <p className="text-xs text-slate-500 mt-1.5 max-w-sm mx-auto">
                   Pick up to 5 concerns from the sidebar and medications will re-rank based on what matters to you
                 </p>
+              </div>
+            )}
+
+            {/* Active Priorities Strip */}
+            {selectedConcerns.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Your priorities:</span>
+                {selectedConcerns.map((concernId) => {
+                  const info = concerns.find((c) => c.id === concernId)
+                  return (
+                    <span
+                      key={concernId}
+                      className="inline-flex items-center rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-1 text-xs font-medium text-indigo-700"
+                    >
+                      {info?.label}
+                    </span>
+                  )
+                })}
               </div>
             )}
 

@@ -103,6 +103,33 @@ export function MedicationCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {/* Selected priorities as chips */}
+        {selectedConcerns.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {selectedConcerns.map((concernId) => {
+              const info = concerns.find((c) => c.id === concernId)
+              const score = medication.scores[concernId]
+              const chipColor = score >= 75
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : score >= 55
+                ? "bg-amber-50 text-amber-700 border-amber-200"
+                : "bg-slate-50 text-slate-600 border-slate-200"
+              return (
+                <span
+                  key={concernId}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
+                    chipColor
+                  )}
+                >
+                  {info?.label.split(" ")[0]}
+                  <span className="font-bold">{score}</span>
+                </span>
+              )
+            })}
+          </div>
+        )}
+
         <div className="flex items-center gap-3 text-xs">
           <Badge variant="outline" className={cn("font-medium", colors.badge)}>
             {medication.class}

@@ -24,7 +24,7 @@ export default function LandingPage() {
         <div className="mx-auto flex h-36 max-w-6xl items-center justify-between px-6">
           <img src="/logo.png" alt="MedCompare" className="h-[120px] w-auto" />
           <Link
-            href="/dashboard"
+            href="/antidepressants"
             className="rounded-full bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
           >
             Open Tool
@@ -38,19 +38,26 @@ export default function LandingPage() {
         <div className="relative mx-auto max-w-6xl px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-slate-900 leading-[1.1]">
-              Find the antidepressant that fits{" "}
+              Find the medication that fits{" "}
               <span className="text-indigo-600">your life</span>
             </h1>
             <p className="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-              Not all medications are the same. Tell us what matters to you — sleep, sexual health,
-              weight, energy — and we'll show you which options score best for your specific priorities.
+              Not all medications are the same. Tell us what matters to you and we'll show you
+              which options score best for your specific priorities.
             </p>
-            <div className="mt-10 flex items-center justify-center gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/dashboard"
+                href="/antidepressants"
                 className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30"
               >
-                Try the Comparison Tool
+                Antidepressants
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/neuro"
+                className="inline-flex items-center gap-2 rounded-full bg-white border-2 border-indigo-200 px-7 py-3.5 text-sm font-semibold text-indigo-700 transition-all hover:bg-indigo-50 hover:border-indigo-300"
+              >
+                Seizure & Migraine
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -225,12 +232,19 @@ export default function LandingPage() {
           <p className="mt-4 text-slate-500">
             No signup required. Pick your priorities and see results instantly.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/dashboard"
+              href="/antidepressants"
               className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30"
             >
-              Open the Comparison Tool
+              Antidepressants
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/neuro"
+              className="inline-flex items-center gap-2 rounded-full bg-white border-2 border-indigo-200 px-8 py-4 text-sm font-semibold text-indigo-700 transition-all hover:bg-indigo-50 hover:border-indigo-300"
+            >
+              Seizure & Migraine
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

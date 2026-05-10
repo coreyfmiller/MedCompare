@@ -68,12 +68,12 @@ export default function MedicationDashboard() {
     <div className="h-screen flex flex-col overflow-hidden bg-white">
       {/* Header — compact */}
       <header className="shrink-0 border-b border-slate-200 bg-white z-50">
-        <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex h-36 max-w-[1600px] items-center justify-between px-4 sm:px-6">
           <Link href="/">
             <img
               src="/logo.png"
               alt="MedCompare"
-              className="h-12 w-auto object-contain"
+              className="h-[120px] w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function MedicationDashboard() {
       {/* Body — fills remaining height */}
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar — scrolls independently */}
-        <aside className="hidden lg:flex w-[300px] shrink-0 border-r border-slate-100 flex-col">
+        <aside className="hidden lg:flex w-[380px] shrink-0 border-r border-slate-100 flex-col">
           <div className="flex-1 overflow-y-auto p-4">
             <PreferenceTuner
               selectedConcerns={selectedConcerns}
